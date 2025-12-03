@@ -80,5 +80,17 @@ java -cp "dependency-egps/*" gui.simple.tools.FilePathNormalizedGUI
 
 To see all available command-line tools:
 ```bash
-java -cp "target/classes:dependency-egps/*" cli.tools.ListTools
+java -cp "../dependency-egps/*" cli.tools.ListTools
+# output
+# Current available programs are:
+#1	cli.tools.ClipboardPathNormalized	Convert the file path C:\a\b\c.txt to /
+#2	cli.tools.CountFilesWithSuffix	Count the files with certain suffix.
+#3	cli.tools.ListFilesWithSuffix	List the names of files in a directory that end with a specified suffix and generate a TSV file.
+#4	cli.tools.SeeModulesWeHave	Display all available modules that implement IModuleSignature interface.
+#5	cli.tools.RemoveInternalNodeNames	Remove internal node names from phylogenetic trees in Newick format.
+#6	cli.tools.NodeNames4Space4Underline	Replace spaces with underscores in phylogenetic tree node names.
+#7	cli.tools.CheckNwkFormat	Validate whether a file is in valid Newick (NWK) format.
+java -cp "../dependency-egps/*" cli.tools.SeeModulesWeHave
 ```
+
+Then you can see all modules
