@@ -1,0 +1,40 @@
+# IntelliJ IDEA
+*.iml
+*.iws
+*.ipr
+.idea/
+out/
+/target/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.jpi
+.DS_Store
+
+# Maven
+/target/
+/mvnw
+/mvnw.cmd
+/.mvn/
+
+# Gradle
+.gradle/
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might be custom
+!.gitignore

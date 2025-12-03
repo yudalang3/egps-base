@@ -5,11 +5,15 @@ import evoltree.phylogeny.PhyloTreeEncoderDecoder;
 import evoltree.struct.EvolNode;
 import evoltree.struct.util.EvolNodeUtil;
 
+
 import java.io.IOException;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import java.util.List;
+
 
 /**
  * Command-line utility to remove internal node names from phylogenetic trees.

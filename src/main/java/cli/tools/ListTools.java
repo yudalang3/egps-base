@@ -96,6 +96,11 @@ public class ListTools {
 		addEntry(ClipboardPathNormalized.class.getName(), "Convert the file path C:\\a\\b\\c.txt to /");
 		addEntry(CountFilesWithSuffix.class.getName(), "Count the files with certain suffix.");
 		addEntry(ListFilesWithSuffix.class.getName(), "List the names of files in a directory that end with a specified suffix and generate a TSV file.");
+		addEntry(SeeModulesWeHave.class.getName(), "Display all available modules that implement IModuleSignature interface.");
+		addEntry(RemoveInternalNodeNames.class.getName(), "Remove internal node names from phylogenetic trees in Newick format.");
+		addEntry(NodeNames4Space4Underline.class.getName(), "Replace spaces with underscores in phylogenetic tree node names.");
+		addEntry(CheckNwkFormat.class.getName(), "Validate whether a file is in valid Newick (NWK) format.");
+
 
 		System.out.println("Current available programs are:");
 
