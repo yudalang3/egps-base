@@ -109,28 +109,44 @@ public class ClipboardPath4Win2WSL {
      * @param args command line arguments (not used)
      */
     public static void main(String[] args) {
-        new ClipboardPath4Win2WSL().run();
+        new ClipboardPath4Win2WSL().run(args);
     }
 
     /**
      * Runs the clipboard path conversion process.
-     * Reads Windows path from clipboard, converts to WSL format, and writes back to clipboard.
+     * If args are provided, converts each argument; otherwise reads Windows path from clipboard,
+     * converts to WSL format, and writes back to clipboard.
      */
-    public void run() {
-        String clipboardText = getClipboardText();
-        if (clipboardText != null) {
-            System.out.println("Original Windows path:");
-            System.out.println(clipboardText);
+    public void run(String[] args) {
+        if (args != null && args.length > 0) {
+            // Convert each argument
+            for (String arg : args) {
+                System.out.println("Original Windows path:");
+                System.out.println(arg);
 
-            String wslPath = convertWindowsPathToWSL(clipboardText);
+                String wslPath = convertWindowsPathToWSL(arg);
 
-            System.out.println("Converted WSL path:");
-            System.out.println(wslPath);
-
-            setClipboardText(wslPath);
-            System.out.println("Already paste to clipboard...");
+                System.out.println("Converted WSL path:");
+                System.out.println(wslPath);
+                System.out.println();
+            }
         } else {
-            System.out.println("No text in the clipboard...");
+            // Use clipboard flow
+            String clipboardText = getClipboardText();
+            if (clipboardText != null) {
+                System.out.println("Original Windows path:");
+                System.out.println(clipboardText);
+
+                String wslPath = convertWindowsPathToWSL(clipboardText);
+
+                System.out.println("Converted WSL path:");
+                System.out.println(wslPath);
+
+                setClipboardText(wslPath);
+                System.out.println("Already paste to clipboard...");
+            } else {
+                System.out.println("No text in the clipboard...");
+            }
         }
     }
 

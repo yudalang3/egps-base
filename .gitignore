@@ -4,7 +4,7 @@
 *.ipr
 .idea/
 out/
-/target/
+target/
 
 # Java
 *.class
@@ -38,3 +38,5 @@ out/
 
 # Files that might be custom
 build_auto_package_and_move.sh
+
+egps-base-0.0.1.jar

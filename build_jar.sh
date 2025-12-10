@@ -4,7 +4,7 @@
 SOURCE_DIR="src/main/java"
 CLASS_OUTPUT="target/classes"
 JAR_NAME="egps-base-0.0.1.jar"
-TEMP_JAR="target/$JAR_NAME"
+TEMP_JAR="$JAR_NAME"
 
 # ===== 检查参数 =====
 if [ -z "$1" ]; then
@@ -47,5 +47,4 @@ for OUTPUT_DIR in "$@"; do
     fi
 done
 
-rm "$TEMP_JAR"
 echo "✅ All done!"
