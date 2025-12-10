@@ -37,4 +37,4 @@ out/
 ._*
 
 # Files that might be custom
-!.gitignore
+build_auto_package_and_move.sh
