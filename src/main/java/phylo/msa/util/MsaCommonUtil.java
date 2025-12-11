@@ -258,54 +258,5 @@ public class MsaCommonUtil {
             return ret;
         }
 
-        //	public static double getDistanceOfTwoDiffType(SNPAndInsertionDiffTypeAspect diffType1,
-        //			SNPAndInsertionDiffTypeAspect diffType2) {
-        //
-        //		double ret = 0;
-        //
-        //		// insitu place
-        //		if (diffType1.isDeletion()) {
-        //			if (diffType2.isDeletion()) {
-        //				if (diffType1.isIfFirstDeletion() && diffType2.isIfFirstDeletion()) {
-        //					if (diffType1.getLengthOfDeletionRefer2RefSeq() == diffType2.getLengthOfDeletionRefer2RefSeq()) {
-        //						ret++;
-        //					}
-        //				}
-        //			} else {
-        //				if (diffType1.isIfFirstDeletion()) {
-        //					ret++;
-        //				}
-        //			}
-        //		} else {
-        //			if (diffType2.isDeletion()) {
-        //				if (diffType2.isIfFirstDeletion()) {
-        //					ret++;
-        //				}
-        //			} else {
-        //				ret += QuickDistUtil.getTwoSNPCharDifferenceWithAmbiguousBaseAccording2IntArray(
-        //						diffType1.getInsituSite(), diffType2.getInsituSite());
-        //			}
-        //		}
-        //
-        //		// insetion String
-        //		boolean type1IsNotRight = diffType1.getInsertionContent().isEmpty() && diffType1.isDeletion();
-        //		boolean type2IsNotRight = diffType2.getInsertionContent().isEmpty() && diffType2.isDeletion();
-        //
-        //		if (type1IsNotRight || type2IsNotRight) {
-        //			// 其中之一有问题都不行
-        //		} else {
-        ////			if (!diffType1.getInsertionContent().equals(diffType2.getInsertionContent())) {
-        ////				ret ++;
-        ////			}
-        //			// 考虑模糊碱基
-        //			if (!QuickDistUtil.judgeTwoAllelesIdentities(diffType1.getInsertionContent(),
-        //					diffType2.getInsertionContent())) {
-        //				ret++;
-        //			}
-        //		}
-        //		return ret;
-        //	}
-
-
     }
 }

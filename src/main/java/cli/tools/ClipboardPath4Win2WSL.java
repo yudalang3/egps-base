@@ -3,6 +3,7 @@ package cli.tools;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,6 +110,7 @@ public class ClipboardPath4Win2WSL {
      * @param args command line arguments (not used)
      */
     public static void main(String[] args) {
+        System.out.println("args is " + Arrays.toString(args));
         new ClipboardPath4Win2WSL().run(args);
     }
 
