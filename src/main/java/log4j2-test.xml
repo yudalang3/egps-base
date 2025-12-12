@@ -1,20 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
- <!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
- <!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
- <!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
-<configuration monitorInterval="0" status="WARN">
-	<appenders>
-<!--		<Console name="Console" target="SYSTEM_ERR">-->
-		<Console name="Console" target="SYSTEM_OUT">
-<!-- 			<PatternLayout pattern="%msg \t|| %d{HH:mm:ss} %-5level [%t] - %logger{10} (%F:%L)%n"/> -->
-			<PatternLayout pattern="%msg || %d{HH:mm:ss} %-5level [%t] (%F:%L)%n"/>
-		</Console>
-	</appenders>
-	<loggers>
-		<root level="INFO">
-		<!-- 配置根记录器，级别设置为 ALL，并将 "Console" 输出器附加到根记录器 -->
-			<appender-ref ref="Console"/>
-		</root>
-	</loggers>
+<!--
+  Log4j2 测试环境配置文件（log4j2-test.xml）
+  说明：
+  - Log4j2 会优先加载 log4j2-test.*，常用于本地/单测时更“啰嗦”的日志。
+  - 本文件当前只配置了一个控制台 appender + root logger。
+
+  常见日志级别（从低到高，配置为某级别时会输出“该级别及以上”的日志）：
+    ALL < TRACE < DEBUG < INFO < WARN < ERROR < FATAL < OFF
+
+  configuration 属性：
+  - status：Log4j2 自身内部日志的输出级别（不是你业务日志级别）。
+            设为 TRACE 会看到 Log4j2 启动、解析配置等细节；一般用 WARN/ERROR。
+  - monitorInterval：配置热加载检测间隔（单位：秒）。
+                     0 表示不自动检测配置变化；>0 时会定期扫描文件并重载。
+-->
+<configuration status="WARN" monitorInterval="0">
+
+    <!--
+      Appenders：输出目的地集合。
+      每个 appender 有一个唯一 name，logger 通过 appender-ref 引用它。
+    -->
+    <appenders>
+
+        <!--
+          Console：输出到控制台。
+          target：
+            - SYSTEM_OUT：标准输出（stdout）
+            - SYSTEM_ERR：标准错误（stderr）
+          现在选择 SYSTEM_OUT；如果你希望错误日志走 stderr，可以改成 SYSTEM_ERR。
+        -->
+        <Console name="Console" target="SYSTEM_OUT">
+
+            <!--
+              PatternLayout：控制每条日志“长什么样”的模板字符串。
+              规则要点：
+              - 每个以 % 开头的占位符都会在运行时被替换成实际值。
+              - 可以给占位符加“格式修饰符”（宽度、对齐、截断）或参数（花括号/括号）。
+              - 普通字符会原样输出（比如这里的 " || "、括号、方括号）。
+
+              当前 pattern：
+                %msg || %d{HH:mm:ss} %-5level [%t] (%F:%L)%n
+
+              逐段解释：
+              1) %msg
+                 - 等价写法：%m
+                 - 含义：业务代码传入的日志正文。
+                   例：logger.info("hello {}", user) → 输出 "hello Bob"
+
+              2) " || "
+                 - 纯文本分隔符，你想换成 " - " 或 "|" 都可以。
+
+              3) %d{HH:mm:ss}
+                 - 含义：时间戳（date）。
+                 - 花括号里的内容是时间格式（Java DateTimeFormatter 风格）。
+                   常见写法：
+                     %d{yyyy-MM-dd HH:mm:ss.SSS}  → 2025-12-12 14:03:27.123
+                     %d{ISO8601}                 → 2025-12-12T14:03:27,123+0800
+                 - 不写花括号时用默认格式：%d
+
+              4) %-5level
+                 - 等价写法：%-5p
+                 - 含义：日志级别（level）。
+                 - %-5 是“格式修饰符”：
+                     * "-" 表示左对齐；没有 "-" 则右对齐。
+                     * "5" 表示最小宽度 5 个字符。
+                   所以 INFO 会补空格成 "INFO "，WARN 变 "WARN "，方便列对齐。
+                 - 想要更长可写 %-5level 或 %-7level 等。
+
+              5) [%t]
+                 - 等价写法：[%thread]
+                 - 含义：线程名（thread）。
+                   例：主线程可能是 "main"，线程池里可能是 "pool-1-thread-3"。
+
+              6) (%F:%L)
+                 - %F：源文件名（File），例如 "MyService.java"
+                 - %L：代码行号（Line），例如 128
+                 - 注意：%F/%L 会让 Log4j2 走“定位信息（location）”路径，
+                   相对更耗性能；测试/本地调试用很方便，但生产环境通常会去掉。
+                   若只要类/方法名，也有：
+                     %C  全限定类名（Class）
+                     %M  方法名（Method）
+
+              7) %n
+                 - 换行（newline），跨平台安全。
+
+              示例输出（假设在 main 线程、MyService.java 第 128 行打印 INFO）：
+                14:03:27 INFO  [main] (MyService.java:128) start sync
+
+              常见可选字段（按需添加）：
+                %logger 或 %c        logger 名称（一般是类全名）
+                %logger{36}         logger 名称最长 36 字符，超出截断
+                %c{1}               只输出最末一级（短类名/包名）
+                %pid                进程号（需要 Log4j2 版本支持）
+                %X{traceId}         MDC 里的 traceId（链路追踪）
+                %ex / %throwable    异常堆栈（常放在最后：%ex{full}）
+                %enc{%msg}{CRLF}    对消息做简单转义/清理
+
+              如果你想在测试里看更全的信息，一个常用模板是：
+                %d{HH:mm:ss.SSS} %-5level [%t] %c{1} - %msg%ex%n
+            -->
+
+            <!--
+              把时间/级别/线程/位置前缀固定放在行首，并将该前缀裁剪/补齐到 80 字符：
+              - 超过 80：右侧截断
+              - 不足 80：右侧补空格
+            -->
+            <PatternLayout pattern="%-80maxLen{%-5level %d{HH:mm:ss} [%t] (%F:%L)}{80} || %msg%n"/>
+
+        </Console>
+
+        <!--
+          这里可以继续加别的 appender（比如 RollingFile 写文件、Async 异步等）。
+          但测试配置通常保持简单，避免影响调试速度。
+        -->
+    </appenders>
+
+    <!--
+      Loggers：定义哪些 logger 输出、输出到哪里。
+      - 你可以为某个包/类单独设级别；
+      - 没有显式配置时会继承 root 的级别和 appender。
+    -->
+    <loggers>
+
+        <!--
+          root：根 logger（所有 logger 的默认父级）。
+          level="INFO"：默认只输出 INFO 及以上级别（INFO/WARN/ERROR/FATAL）。
+            - 如果你想在测试里看更多细节，可以改成 DEBUG 或 TRACE。
+          appender-ref：把 root 的日志发给哪个 appender（这里是 Console）。
+        -->
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+        </root>
+
+    </loggers>
 </configuration>
