@@ -83,14 +83,27 @@ To see all available command-line tools:
 java -cp "../dependency-egps/*" cli.tools.ListTools
 # output
 # Current available programs are:
-#1	cli.tools.ClipboardPathNormalized	Convert the file path C:\a\b\c.txt to /
-#2	cli.tools.CountFilesWithSuffix	Count the files with certain suffix.
-#3	cli.tools.ListFilesWithSuffix	List the names of files in a directory that end with a specified suffix and generate a TSV file.
-#4	cli.tools.SeeModulesWeHave	Display all available modules that implement IModuleSignature interface.
-#5	cli.tools.RemoveInternalNodeNames	Remove internal node names from phylogenetic trees in Newick format.
-#6	cli.tools.NodeNames4Space4Underline	Replace spaces with underscores in phylogenetic tree node names.
-#7	cli.tools.CheckNwkFormat	Validate whether a file is in valid Newick (NWK) format.
+#1	cli.tools.ClipboardPath4Win2WSL	Convert Windows file paths from clipboard to WSL format (e.g., C:\Users\... → /mnt/c/Users/...) and paste back to clipboard.
+#2	cli.tools.ClipboardPathNormalized	Normalize file paths from clipboard by converting all backslashes to forward slashes for cross-platform compatibility.
+#3	cli.tools.CountFilesWithSuffix	Count the number of files in a directory that match a specific file extension (non-recursive).
+#4	cli.tools.ListFilesWithSuffix	List all files in a directory with a specified suffix and optionally export the filenames to a TSV file for batch processing.
+#5	cli.tools.CheckNwkFormat	Validate whether a file contains phylogenetic trees in valid Newick (NWK) format by attempting to parse each line.
+#6	cli.tools.RemoveInternalNodeNames	Remove internal node names from phylogenetic trees in Newick format while preserving leaf names, branch lengths, and tree topology.
+#7	cli.tools.NodeNames4Space4Underline	Replace all spaces in phylogenetic tree node names with underscores to ensure compatibility with phylogenetic analysis tools.
+#8	fasta.comparison.FastaComparer	Compare two FASTA files using BLAST/Diamond alignment results (fmt6 format) to calculate sequence match coverage ratios.
+#9	fasta.comparison.PairwiseSeqDiffPrinter	Visualize pairwise sequence alignment differences with customizable marking modes, showing matches or mismatches and identity percentage.
+#10	fasta.stat.UniqueStat	Analyze FASTA file for duplicate sequences, reporting frequency counts and calculating the repeat ratio for quality control.
+#11	fasta.stat.BatchUniqueStat	Batch process multiple FASTA files for duplicate sequence analysis, generating statistics for all files in a directory.
+#12	cli.tools.SeeModulesWeHave	Display a comprehensive list of all available eGPS modules that implement the IModuleSignature interface with their descriptions.
 java -cp "../dependency-egps/*" cli.tools.SeeModulesWeHave
 ```
 
-Then you can see all modules
+Then you can see all modules.
+
+# What functionalities are included?
+
+This base module has been continuously developed over the author's six years of PhD and several years of postdoctoral research, containing many essential components. However, it's impossible to document everything here.
+
+Since we have open-sourced all the code, you are welcome to read the source code directly - every class has comments.
+
+I haven't generated Javadoc because Javadoc is not very useful for code users, and I believe Javadoc is very unfriendly for developers. Check the `docs` subdirectory for complete class documentation.

@@ -2,6 +2,8 @@
 
 eGPS2 项目的核心基础设施。完整的类文档请参见 `docs` 子目录。
 
+[English README](README.md)
+
 
 ## 关于本项目
 
@@ -79,14 +81,27 @@ java -cp "dependency-egps/*" gui.simple.tools.FilePathNormalizedGUI
 java -cp "../dependency-egps/*" cli.tools.ListTools
 # output
 # Current available programs are:
-#1	cli.tools.ClipboardPathNormalized	Convert the file path C:\a\b\c.txt to /
-#2	cli.tools.CountFilesWithSuffix	Count the files with certain suffix.
-#3	cli.tools.ListFilesWithSuffix	List the names of files in a directory that end with a specified suffix and generate a TSV file.
-#4	cli.tools.SeeModulesWeHave	Display all available modules that implement IModuleSignature interface.
-#5	cli.tools.RemoveInternalNodeNames	Remove internal node names from phylogenetic trees in Newick format.
-#6	cli.tools.NodeNames4Space4Underline	Replace spaces with underscores in phylogenetic tree node names.
-#7	cli.tools.CheckNwkFormat	Validate whether a file is in valid Newick (NWK) format.
+#1	cli.tools.ClipboardPath4Win2WSL	Convert Windows file paths from clipboard to WSL format (e.g., C:\Users\... → /mnt/c/Users/...) and paste back to clipboard.
+#2	cli.tools.ClipboardPathNormalized	Normalize file paths from clipboard by converting all backslashes to forward slashes for cross-platform compatibility.
+#3	cli.tools.CountFilesWithSuffix	Count the number of files in a directory that match a specific file extension (non-recursive).
+#4	cli.tools.ListFilesWithSuffix	List all files in a directory with a specified suffix and optionally export the filenames to a TSV file for batch processing.
+#5	cli.tools.CheckNwkFormat	Validate whether a file contains phylogenetic trees in valid Newick (NWK) format by attempting to parse each line.
+#6	cli.tools.RemoveInternalNodeNames	Remove internal node names from phylogenetic trees in Newick format while preserving leaf names, branch lengths, and tree topology.
+#7	cli.tools.NodeNames4Space4Underline	Replace all spaces in phylogenetic tree node names with underscores to ensure compatibility with phylogenetic analysis tools.
+#8	fasta.comparison.FastaComparer	Compare two FASTA files using BLAST/Diamond alignment results (fmt6 format) to calculate sequence match coverage ratios.
+#9	fasta.comparison.PairwiseSeqDiffPrinter	Visualize pairwise sequence alignment differences with customizable marking modes, showing matches or mismatches and identity percentage.
+#10	fasta.stat.UniqueStat	Analyze FASTA file for duplicate sequences, reporting frequency counts and calculating the repeat ratio for quality control.
+#11	fasta.stat.BatchUniqueStat	Batch process multiple FASTA files for duplicate sequence analysis, generating statistics for all files in a directory.
+#12	cli.tools.SeeModulesWeHave	Display a comprehensive list of all available eGPS modules that implement the IModuleSignature interface with their descriptions.
 java -cp "../dependency-egps/*" cli.tools.SeeModulesWeHave
 ```
 
 然后你就可以看到所有可用的模块。
+
+# 具有有哪些功能？
+
+这个基础模块，是作者博士六年，加上博后几年时间连续制作而成，里面有很多精华。但是无法全部都写出来。
+
+因为我们已经将代码都开源了，欢迎各位直接看源代码，每个类都有注释。
+
+Javadoc 我没有生成，因为 Javadoc 对于编写代码用户不是很大。而且我认为 Javadoc 对于开发人员来说，非常不友好。完整的类文档请参见 `docs` 子目录。

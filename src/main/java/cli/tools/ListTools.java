@@ -50,6 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   <li><strong>FastaComparer</strong> - Calculate sequence match coverage using alignment results</li>
  *   <li><strong>PairwiseSeqDiffPrinter</strong> - Visualize pairwise sequence alignment differences</li>
  *   <li><strong>UniqueStat</strong> - Detect duplicate sequences and calculate repeat ratios</li>
+ *   <li><strong>BatchUniqueStat</strong> - Batch process multiple FASTA files for duplicate analysis</li>
  * </ul>
  * 
  * <h3>System Utilities</h3>
@@ -143,6 +144,7 @@ public class ListTools {
 		addEntry("fasta.comparison.FastaComparer", "Compare two FASTA files using BLAST/Diamond alignment results (fmt6 format) to calculate sequence match coverage ratios.");
 		addEntry("fasta.comparison.PairwiseSeqDiffPrinter", "Visualize pairwise sequence alignment differences with customizable marking modes, showing matches or mismatches and identity percentage.");
 		addEntry("fasta.stat.UniqueStat", "Analyze FASTA file for duplicate sequences, reporting frequency counts and calculating the repeat ratio for quality control.");
+		addEntry("fasta.stat.BatchUniqueStat", "Batch process multiple FASTA files for duplicate sequence analysis, generating statistics for all files in a directory.");
 		
 		// System utilities
 		addEntry(SeeModulesWeHave.class.getName(), "Display a comprehensive list of all available eGPS modules that implement the IModuleSignature interface with their descriptions.");
