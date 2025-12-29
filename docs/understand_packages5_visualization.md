@@ -34,7 +34,7 @@ This document covers packages for data visualization, tree rendering, and GUI co
 - **Performance:** O(n) complexity, lightweight memory usage
 - **Importance:** ⭐⭐⭐⭐ (Core visualization component)
 
-**`AxisTickCalculatorByClaude4`** (Class)
+**`AxisTickCalculatorHeavy`** (Class)
 - **Function:** Advanced axis tick calculator with intelligent optimization
 - **Key Features:**
   - Adaptive step selection with multiple density options
@@ -342,7 +342,7 @@ calc.determineAxisTick();
 
 ### Example 2: Enhanced Ticks
 ```java
-AxisTickCalculatorByClaude4 calc = new AxisTickCalculatorByClaude4();
+AxisTickCalculatorHeavy calc = new AxisTickCalculatorHeavy();
 calc.setMinAndMaxPair(0.0, 100.0);
 calc.setWorkingSpace(500);
 calc.determineAxisTick();
@@ -353,7 +353,7 @@ calc.determineAxisTick();
 
 ## Best Practices
 
-1. **Use AxisTickCalculatorByClaude4** for publication-quality plots
+1. **Use AxisTickCalculatorHeavy** for publication-quality plots
 2. **Use DefaultLinerColorMapper** for standard heatmaps
 3. **Create custom gradients** with GradientColorHolder for specialized visualizations
 4. **Use BaseGraphicNode** as base class for tree visualization nodes

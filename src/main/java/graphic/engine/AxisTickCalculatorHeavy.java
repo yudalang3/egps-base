@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * 高级轴刻度计算器，是AxisTickCalculator的改进版本。
- * 
+ *
  * <p>
  * 该类提供了更智能和灵活的轴刻度计算算法，具有以下改进：
  * <ul>
@@ -20,7 +20,7 @@ import java.util.List;
  *   <li><strong>智能边界处理</strong>：确保刻度能够覆盖数据范围</li>
  * </ul>
  * </p>
- * 
+ *
  * <h2>算法特点</h2>
  * <p>
  * 相比原始版本，该计算器具有以下优势：
@@ -31,40 +31,39 @@ import java.util.List;
  *   <li>智能评分系统考虑刻度数量、密度和边界覆盖</li>
  *   <li>自动选择最优的刻度布局</li>
  * </ul>
- * 
+ *
  * <h2>使用示例</h2>
  * <pre>
  * // 创建计算器
- * AxisTickCalculatorByClaude4 calculator = new AxisTickCalculatorByClaude4();
- * 
+ * AxisTickCalculatorHeavy calculator = new AxisTickCalculatorHeavy();
+ *
  * // 设置数据范围
  * Pair&lt;Double, Double&gt; minMax = Pair.of(52.5, 57.5);
  * calculator.setMinAndMaxPair(minMax);
- * 
+ *
  * // 设置工作空间
  * calculator.setWorkingSpace(250);
  * calculator.setWorkSpaceRatio(1.0f);
- * 
+ *
  * // 计算刻度
  * calculator.determineAxisTick();
- * 
+ *
  * // 获取结果
  * List&lt;String&gt; labels = calculator.getTickLabels();
  * List&lt;Integer&gt; locations = calculator.getTickLocations();
  * </pre>
- * 
+ *
  * <h2>性能考虑</h2>
  * <p>
  * 该算法会尝试多种步长提示并评估每种结果的质量，因此计算复杂度比原始版本稍高，
  * 但能够提供更美观和实用的刻度布局。对于大多数应用场景，性能影响可以忽略不计。
  * </p>
- * 
- * @author Claude4 (AI改进版本)
+ *
  * @version 1.0
  * @since 1.0
  * @see AxisTickCalculator 原始版本的轴刻度计算器
  */
-public class AxisTickCalculatorByClaude4 {
+public class AxisTickCalculatorHeavy {
 
     private Pair<Double, Double> minAndMaxPair;
     private List<Integer> tickLocations = new LinkedList<>();

@@ -34,7 +34,7 @@
 - **性能：** O(n) 复杂度，轻量级内存使用
 - **重要性：** ⭐⭐⭐⭐ (核心可视化组件)
 
-**`AxisTickCalculatorByClaude4`** (类)
+**`AxisTickCalculatorHeavy`** (类)
 - **功能：** 具有智能优化的高级轴刻度计算器
 - **关键特性：**
   - 具有多个密度选项的自适应步长选择
@@ -342,7 +342,7 @@ calc.determineAxisTick();
 
 ### 示例 2：增强刻度
 ```java
-AxisTickCalculatorByClaude4 calc = new AxisTickCalculatorByClaude4();
+AxisTickCalculatorHeavy calc = new AxisTickCalculatorHeavy();
 calc.setMinAndMaxPair(0.0, 100.0);
 calc.setWorkingSpace(500);
 calc.determineAxisTick();
@@ -353,7 +353,7 @@ calc.determineAxisTick();
 
 ## 最佳实践
 
-1. **使用 AxisTickCalculatorByClaude4** 用于出版质量的绘图
+1. **使用 AxisTickCalculatorHeavy** 用于出版质量的绘图
 2. **使用 DefaultLinerColorMapper** 用于标准热图
 3. **使用 GradientColorHolder 创建自定义渐变** 用于专门的可视化
 4. **使用 BaseGraphicNode** 作为树可视化节点的基类

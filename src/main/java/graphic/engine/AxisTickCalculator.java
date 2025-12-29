@@ -81,7 +81,7 @@ import org.apache.commons.lang3.tuple.Pair;
  * @author eGPS Development Team
  * @version 1.0
  * @since 1.0
- * @see AxisTickCalculatorByClaude4 改进版本的高级轴刻度计算器
+ * @see AxisTickCalculatorHeavy 改进版本的高级轴刻度计算器
  */
 public class AxisTickCalculator {
 
