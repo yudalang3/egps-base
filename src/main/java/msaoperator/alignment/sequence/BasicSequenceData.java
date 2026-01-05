@@ -66,7 +66,7 @@ public class BasicSequenceData {
 	 * @Date Created on:2019-07-16 17:16
 	 */
 	public int getLength() {
-		if (dataSequences.size() == 0) {
+		if (dataSequences.isEmpty()) {
 			return 0;
 		}
 
