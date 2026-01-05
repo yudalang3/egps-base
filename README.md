@@ -4,6 +4,7 @@ The core infrastructure of the eGPS2 project. See the `docs` subdirectory for co
 
 [中文版 README](README_zh.md)
 
+If you would like a bundled version that includes egps-base, egps-shell, and egps-pathway.evol.browser, please visit: https://github.com/yudalang3/eGPS2.1
 
 ## About this project
 

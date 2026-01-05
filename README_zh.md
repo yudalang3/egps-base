@@ -4,6 +4,7 @@ eGPS2 项目的核心基础设施。完整的类文档请参见 `docs` 子目录
 
 [English README](README.md)
 
+如果您想要一个egps-base, egps-shell和egps-pathway.evol.browser 捆绑在一起的版本，请访问 https://github.com/yudalang3/eGPS2.1
 
 ## 关于本项目
 
