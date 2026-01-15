@@ -29,7 +29,6 @@ target/
 *.log
 
 # OS
-.DS_Store
 .AppleDouble
 .LSOverride
 
