@@ -21,14 +21,14 @@ import java.util.*;
 
 /**
  * Homologous gene finder script combining BLASTP and HMMER analysis.
- * 
+ *
  * <p>
  * This script integrates BLASTP sequence similarity searches with HMMER domain
  * analysis to identify homologous genes across multiple species. It is specifically
  * designed for pathway analysis (e.g., Wnt signaling pathway) by combining multiple
  * evidence types: sequence similarity, domain architecture, and coverage analysis.
  * </p>
- * 
+ *
  * <h2>Core Methodology:</h2>
  * <p>
  * The script implements a comprehensive homologous gene detection strategy:
@@ -40,7 +40,7 @@ import java.util.*;
  *   <li><strong>Coverage Analysis:</strong> Ensures sufficient sequence coverage for reliable homology</li>
  *   <li><strong>Best Hit Filtering:</strong> Selects optimal hits to avoid redundancy</li>
  * </ol>
- * 
+ *
  * <h2>Input Requirements:</h2>
  * <p>
  * The script expects a directory structure with species-specific subdirectories containing:
@@ -52,7 +52,7 @@ import java.util.*;
  *   <li><strong>Domain Annotations:</strong> HMMER Pfam scan results in table format</li>
  *   <li><strong>Reference Domains:</strong> Curated domain criteria for homology assessment</li>
  * </ul>
- * 
+ *
  * <h2>Command Line Parameters:</h2>
  * <ul>
  *   <li><strong>args[0]:</strong> Input directory containing species data</li>
@@ -60,13 +60,13 @@ import java.util.*;
  *   <li><strong>args[2]:</strong> Species order file (optional, TSV format)</li>
  *   <li><strong>args[3]:</strong> Output directory for results</li>
  * </ul>
- * 
+ *
  * <h2>Output Files:</h2>
  * <ul>
  *   <li><strong>summary_wnt_comp_my_criterion_cov{30,40,50}.tsv:</strong> Homology assessment results with different coverage thresholds</li>
  *   <li><strong>Matrix Format:</strong> Species vs. gene component count matrix</li>
  * </ul>
- * 
+ *
  * <h2>Key Features:</h2>
  * <ul>
  *   <li><strong>Multi-evidence Integration:</strong> Combines sequence similarity and domain architecture</li>
@@ -76,7 +76,7 @@ import java.util.*;
  *   <li><strong>Flexible Criteria:</strong> Supports both clan-based and domain-based matching</li>
  *   <li><strong>Comprehensive Logging:</strong> Detailed progress and error reporting</li>
  * </ul>
- * 
+ *
  * <h2>Domain Matching Algorithm:</h2>
  * <p>
  * The script implements sophisticated domain matching logic:
@@ -88,7 +88,7 @@ import java.util.*;
  *   <li><strong>Clan-based matching:</strong> Uses Pfam clans for broader domain relationships</li>
  *   <li><strong>Domain-based matching:</strong> Uses specific Pfam domains for precise matching</li>
  * </ul>
- * 
+ *
  * <h2>Coverage Analysis:</h2>
  * <p>
  * Sequence coverage is calculated to ensure sufficient alignment quality:
@@ -98,7 +98,7 @@ import java.util.*;
  *   <li><strong>Coverage Calculation:</strong> Percentage of query sequence covered by alignments</li>
  *   <li><strong>Threshold Filtering:</strong> Filters results below coverage thresholds (30%, 40%, 50%)</li>
  * </ul>
- * 
+ *
  * <h2>Usage Example:</h2>
  * <pre>
  * {@code
@@ -110,7 +110,7 @@ import java.util.*;
  * });
  * }
  * </pre>
- * 
+ *
  * <h2>Related Classes:</h2>
  * <ul>
  *   <li>{@link BlastHspRecord}: BLAST result parsing and representation</li>
@@ -118,7 +118,7 @@ import java.util.*;
  *   <li>{@link TSVReader}: TSV file reading utilities</li>
  *   <li>{@link KitTable}: Table data structure for TSV processing</li>
  * </ul>
- * 
+ *
  * @author eGPS Development Team
  * @since 1.0
  * @see BlastHspRecord
@@ -160,9 +160,9 @@ public class Script_homoGene_finder_blastpWithHmmer {
             } else if (numberOfCriterion == 0) {
                 int candidateSize = candidateClans.size() + candidateDomains.size();
                 //这个逻辑就是 标准的都鉴定不到结构域，那么现在就更加不可能鉴定到了
-                if (candidateSize > 0 ){
+                if (candidateSize > 0) {
                     return false;
-                }else {
+                } else {
                     return true;
                 }
             } else if (numberOfCriterion > 3) {
@@ -187,35 +187,96 @@ public class Script_homoGene_finder_blastpWithHmmer {
     final String fastaOfAllSequence = "fa.gz";
 
     private static boolean debug = false;
+
+    /**
+     * Displays help information for the script usage
+     */
+    private static void showHelp() {
+        System.err.println("Usage: Script_homoGene_finder_blastpWithHmmer <input_directory> <domain_criteria_file> <species_order_file> <output_directory>");
+        System.err.println();
+        System.err.println("Parameters:");
+        System.err.println("  input_directory      Directory containing species data subdirectories with FASTA and BLAST files");
+        System.err.println("  domain_criteria_file TSV file containing reference domain criteria for homology assessment");
+        System.err.println("  species_order_file   Optional TSV file specifying the order of species in output (use 'null' if not needed)");
+        System.err.println("  output_directory     Directory where results will be written");
+        System.err.println();
+        System.err.println("Example:");
+        System.err.println("  java Script_homoGene_finder_blastpWithHmmer \\\\");
+        System.err.println("    /path/to/species/data \\\\");
+        System.err.println("    /path/to/domain/criteria.tsv \\\\");
+        System.err.println("    /path/to/species/order.tsv \\\\");
+        System.err.println("    /path/to/output/");
+        System.err.println();
+        System.err.println("Required input directory structure:");
+        System.err.println("  input_directory/");
+        System.err.println("    species1/");
+        System.err.println("      *.fa.gz              - Protein sequences in compressed FASTA format");
+        System.err.println("      1.blastp.result.tsv  - BLASTP results in tab-separated format");
+        System.err.println("      3.wnt_candidates_domain.tbl - HMMER/Pfam domain annotations");
+        System.err.println("      1.diamond.out.more.sensitive.tsv - Diamond BLAST results");
+        System.err.println("    species2/");
+        System.err.println("      ...                  - Same structure as species1");
+    }
+
     public static void main(String[] args) throws IOException {
-        String pathOfDir = "C:\\Users\\yudal\\Documents\\project\\WntEvolution\\Archieve\\SpeciesDataSet1_oneSpeciesOnePhylum\\processed\\run_on_20250421_novelPipeline";
-        String humanWntCompDomainFile = "C:\\Users\\yudal\\Documents\\project\\WntEvolution\\Archieve\\Wnt_QuerySequences\\compoentSet4\\set4\\pfam_curated_seq_domains.sorted.mandatoryDomain.reduced.tsv";
-        String speciesOrderPath = null;
-        String outputDirPath = "C:\\Users\\yudal\\Documents\\project\\WntEvolution\\Archieve\\SpeciesDataSet1_oneSpeciesOnePhylum\\processed\\20250421_final_wnt_pathway_matrix_and_corr2bodyplan\\oneCandidate2geneCount";
-//        speciesOrderPath = "C:\\Users\\yudal\\Documents\\project\\WntEvolution\\Archieve\\Holzem et al., 2024_used_to_judge_homo\\process\\passing_by_similarity\\dir_to_run_mine_blastp_EDA_no_clan_overlap\\summary_wnt_comp_blastp.tsv";
-        if (args.length > 0) {
-            pathOfDir = args[0];
-            humanWntCompDomainFile = args[1];
-            speciesOrderPath = args[2];
-            outputDirPath = args[3];
+        // Check if correct number of arguments are provided
+        if (args.length != 4) {
+            System.err.println("Error: Invalid number of arguments. Expected 4 arguments but got " + args.length);
+            System.err.println();
+            showHelp();
+            System.exit(1);
         }
+
+        // Check if arguments are empty
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] == null || args[i].trim().isEmpty()) {
+                System.err.println("Error: Argument " + i + " is empty or null");
+                System.err.println();
+                showHelp();
+                System.exit(1);
+            }
+        }
+
+        String pathOfDir = args[0];
+        String humanWntCompDomainFile = args[1];
+        String speciesOrderPath = args[2];
+        String outputDirPath = args[3];
+
+        // Validate input directory exists
+        if (!Files.exists(Paths.get(pathOfDir))) {
+            System.err.println("Error: Input directory does not exist: " + pathOfDir);
+            System.exit(1);
+        }
+
+        // Validate domain criteria file exists (unless it's "null" string)
+        if (!"null".equals(speciesOrderPath) && !Files.exists(Paths.get(humanWntCompDomainFile))) {
+            System.err.println("Error: Domain criteria file does not exist: " + humanWntCompDomainFile);
+            System.exit(1);
+        }
+
+        // Validate output directory exists
+        if (!Files.exists(Paths.get(outputDirPath))) {
+            System.err.println("Error: Output directory does not exist: " + outputDirPath);
+            System.exit(1);
+        }
+
         Script_homoGene_finder_blastpWithHmmer scriptHomoGeneFinderBlastpWithHmmer = new Script_homoGene_finder_blastpWithHmmer();
         scriptHomoGeneFinderBlastpWithHmmer.configSequenceDom(humanWntCompDomainFile);
 
         List<String> speciesOrderList = Lists.newArrayList();
 
-        if (StringUtils.isNotEmpty(speciesOrderPath)){
+        if (!"null".equals(speciesOrderPath) && StringUtils.isNotEmpty(speciesOrderPath)) {
             TSVReader.readTsvTextFile(speciesOrderPath).getContents().forEach(strings -> {
                 String seqName = strings.getFirst();
                 speciesOrderList.add(seqName);
             });
             scriptHomoGeneFinderBlastpWithHmmer.configSpeciesOrder(speciesOrderList);
-        }else {
+        } else {
             // If the species order is not provided, use the dir names instead.
         }
 
         String parentPath = outputDirPath;
-        if (!debug){
+        if (!debug) {
             {
                 scriptHomoGeneFinderBlastpWithHmmer.output_summary_table_path = parentPath + "/summary_wnt_comp_my_criterion_cov50.tsv";
                 scriptHomoGeneFinderBlastpWithHmmer.CANDIDATES_COVERAGE_THRESHOLD = 0.5;
@@ -250,7 +311,7 @@ public class Script_homoGene_finder_blastpWithHmmer {
 
             Criterion criterion = name2criterion.computeIfAbsent(seqName, k -> new Criterion());
             int length = Integer.parseInt(lengthStr);
-            if (length > 0){
+            if (length > 0) {
                 if (Objects.equals(clan, NO_CLAN_STR)) {
                     criterion.domains.add(domainName);
                 } else {
@@ -263,7 +324,7 @@ public class Script_homoGene_finder_blastpWithHmmer {
                         criterion.clans.add(clan);
                     }
                 }
-            }else {
+            } else {
 
             }
         });
@@ -273,26 +334,26 @@ public class Script_homoGene_finder_blastpWithHmmer {
 
         Map<Path, String> speciesName2fastaPath = Maps.newLinkedHashMap();
         List<Path> paths = Files.list(Path.of(pathOfDir)).toList();
-        for (Path path : paths){
+        for (Path path : paths) {
             if (!Files.isDirectory(path)) {
                 continue;
             }
             List<Path> list = Files.list(path).toList();
             boolean hasFastaFile = false;
-            for (Path path1 : list){
-                if (path1.getFileName().toString().endsWith(fastaOfAllSequence)){
+            for (Path path1 : list) {
+                if (path1.getFileName().toString().endsWith(fastaOfAllSequence)) {
                     speciesName2fastaPath.put(path, path1.toString());
                     hasFastaFile = true;
                     break;
                 }
             }
 
-            if (!hasFastaFile){
+            if (!hasFastaFile) {
                 log.warn("The path {} is not meet command (don not hava the *fa.gz file), skip it.", path.getFileName().toString());
             }
         }
 
-        if (this.speciesOrderList == null){
+        if (this.speciesOrderList == null) {
             this.speciesOrderList = Lists.newArrayList();
             for (Map.Entry<Path, String> entry : speciesName2fastaPath.entrySet()) {
                 speciesOrderList.add(entry.getKey().getFileName().toString());
@@ -330,7 +391,7 @@ public class Script_homoGene_finder_blastpWithHmmer {
             filterAlignment4bestHits(blastHspRecords, diamondBlastHspRecords);
             handleOneSpecies(dir, fastaGzFile, blastHspRecords, diamondBlastHspRecords, name2PfamScanRecords);
 
-            if (debug){
+            if (debug) {
 //                look4confusedFormalMembers(dir.getFileName().toString());
             }
         }
@@ -357,18 +418,18 @@ public class Script_homoGene_finder_blastpWithHmmer {
             List<BlastHspRecord> list = candidateName2listMap.computeIfAbsent(blastHspRecord.getQseqid(), k -> Lists.newArrayList());
             list.add(blastHspRecord);
         }
-        for (Map.Entry<String, List<BlastHspRecord>> entry : candidateName2listMap.entrySet()){
+        for (Map.Entry<String, List<BlastHspRecord>> entry : candidateName2listMap.entrySet()) {
             String key = entry.getKey();
             List<BlastHspRecord> list = entry.getValue();
             Set<String> set = Sets.newHashSet();
-            for (BlastHspRecord blastHspRecord : list){
+            for (BlastHspRecord blastHspRecord : list) {
                 set.add(blastHspRecord.getSseqid());
             }
-            if (set.size() == 1){
+            if (set.size() == 1) {
                 querySubjectTable.put(key, set.iterator().next(), Boolean.TRUE);
             } else if (set.isEmpty()) {
                 throw new IllegalArgumentException("Impossible...");
-            }else {
+            } else {
                 list.sort(recordComparator);
                 BlastHspRecord last = list.getLast();
                 querySubjectTable.put(key, last.getSseqid(), Boolean.TRUE);
@@ -377,13 +438,13 @@ public class Script_homoGene_finder_blastpWithHmmer {
 
         for (BlastHspRecord blastHspRecord : blastHspRecords) {
             Boolean bool = querySubjectTable.get(blastHspRecord.getQseqid(), blastHspRecord.getSseqid());
-            if (bool != null && bool){
+            if (bool != null && bool) {
                 blastHspRecordsBack.add(blastHspRecord);
             }
         }
         for (BlastHspRecord blastHspRecord : diamondBlastHspRecords) {
             Boolean bool = querySubjectTable.get(blastHspRecord.getQseqid(), blastHspRecord.getSseqid());
-            if (bool != null && bool){
+            if (bool != null && bool) {
                 diamondBlastHspRecordsBack.add(blastHspRecord);
             }
         }
@@ -402,7 +463,7 @@ public class Script_homoGene_finder_blastpWithHmmer {
 
     private void summary() {
         // System.out 重定向到一个文件
-        if (!debug){
+        if (!debug) {
             try {
                 PrintStream printStream = new PrintStream(output_summary_table_path);
                 System.setOut(printStream);
@@ -418,7 +479,7 @@ public class Script_homoGene_finder_blastpWithHmmer {
         System.out.println();
         Set<String> strings = table.rowKeySet();
         for (String species : speciesOrderList) {
-            if (!strings.contains(species)){
+            if (!strings.contains(species)) {
                 continue;
             }
             System.out.print(species);
@@ -433,7 +494,7 @@ public class Script_homoGene_finder_blastpWithHmmer {
         }
     }
 
-    private void handleOneSpecies(Path dir,String fastaGzFile, List<BlastHspRecord> blastHspRecords, List<BlastHspRecord> diamondBlastHspRecords, Map<String, List<PfamScanRecord>> name2PfamScanRecords) {
+    private void handleOneSpecies(Path dir, String fastaGzFile, List<BlastHspRecord> blastHspRecords, List<BlastHspRecord> diamondBlastHspRecords, Map<String, List<PfamScanRecord>> name2PfamScanRecords) {
         // Use the union of them
         Map<String, Set<String>> wntComp2candidatesMap = Maps.newHashMap();
         for (BlastHspRecord blastHspRecord : blastHspRecords) {
@@ -483,18 +544,18 @@ public class Script_homoGene_finder_blastpWithHmmer {
 //        log.info("Species: {}, total count: {}, unique count: {}, more than once count: {}", speciesName, totalCount, uniqueCount, totalCount - uniqueCount);
 
         Map<String, List<String>> map = Maps.newHashMap();
-        for (Map.Entry<String, List<String>> entry : row.entrySet()){
+        for (Map.Entry<String, List<String>> entry : row.entrySet()) {
             String key = entry.getKey();
             List<String> value = entry.getValue();
-            for (String name : value){
+            for (String name : value) {
                 List<String> strings = map.computeIfAbsent(name, k -> Lists.newArrayList());
                 strings.add(key);
             }
         }
         Set<String> uniqueNames = Sets.newHashSet();
-        for (Map.Entry<String, List<String>> entry : map.entrySet()){
+        for (Map.Entry<String, List<String>> entry : map.entrySet()) {
             List<String> value = entry.getValue();
-            if (value.size() > 1){
+            if (value.size() > 1) {
 //                log.info("Species: {}, name: {}, components: {}", speciesName, entry.getKey(), value);
                 uniqueNames.addAll(value);
             }
@@ -514,8 +575,8 @@ public class Script_homoGene_finder_blastpWithHmmer {
         MutableInt matchedProteinCount = new MutableInt();
         List<String> formalMembers = Lists.newArrayList();
 
-        if (debug){
-            if (Objects.equals(wntComponent,"NKD1") && Objects.equals(speciesName,"Vertebrata")){
+        if (debug) {
+            if (Objects.equals(wntComponent, "NKD1") && Objects.equals(speciesName, "Vertebrata")) {
                 System.out.println("SHISA2");
             }
         }
@@ -528,7 +589,7 @@ public class Script_homoGene_finder_blastpWithHmmer {
 
                 Set<String> clans = Sets.newHashSet();
                 Set<String> domains = Sets.newHashSet();
-                if (pfamScanRecords != null){
+                if (pfamScanRecords != null) {
                     pfamScanRecords.forEach(pfamScanRecord -> {
                         domains.add(pfamScanRecord.getHmmName());
                         clans.add(pfamScanRecord.getClan());
@@ -545,10 +606,10 @@ public class Script_homoGene_finder_blastpWithHmmer {
                  */
                 boolean matched = criterion.judgeMatchedDomain(clans, domains);
                 Integer length = seqName2lengthMap.get(seqName);
-                if (length == null){
+                if (length == null) {
                     throw new IllegalArgumentException("Please check your fasta file.");
                 }
-                if (!matched){
+                if (!matched) {
                     continue;
                 }
                 countFIrstMatch++;
@@ -557,7 +618,7 @@ public class Script_homoGene_finder_blastpWithHmmer {
                 if (coverageMatched) {
                     matchedProteinCount.increment();
                     formalMembers.add(seqName);
-                }else {
+                } else {
 
                 }
             }
@@ -567,41 +628,41 @@ public class Script_homoGene_finder_blastpWithHmmer {
         //System.out.printf("%-10s %-5d %-15d%n", wntComponent, criterion.getNumberOfCriterion(), matchedProteinCount.intValue());
     }
 
-    private double judgeCoverage(List<BlastHspRecord> blastHspRecords, List<BlastHspRecord> diamondBlastHspRecords, String seqName,int queryLength, String wntComponent) {
+    private double judgeCoverage(List<BlastHspRecord> blastHspRecords, List<BlastHspRecord> diamondBlastHspRecords, String seqName, int queryLength, String wntComponent) {
         List<BlastHspRecord> queryHspRecords = Lists.newLinkedList();
         int count = 0;
-        for (BlastHspRecord blastHspRecord : blastHspRecords){
-            if (Objects.equals(blastHspRecord.getQseqid(), seqName) && Objects.equals(blastHspRecord.getSseqid(), wntComponent)){
+        for (BlastHspRecord blastHspRecord : blastHspRecords) {
+            if (Objects.equals(blastHspRecord.getQseqid(), seqName) && Objects.equals(blastHspRecord.getSseqid(), wntComponent)) {
                 queryHspRecords.add(blastHspRecord);
                 count++;
             }
         }
-        for (BlastHspRecord blastHspRecord : diamondBlastHspRecords){
-            if (Objects.equals(blastHspRecord.getQseqid(), seqName) && Objects.equals(blastHspRecord.getSseqid(), wntComponent)){
+        for (BlastHspRecord blastHspRecord : diamondBlastHspRecords) {
+            if (Objects.equals(blastHspRecord.getQseqid(), seqName) && Objects.equals(blastHspRecord.getSseqid(), wntComponent)) {
                 queryHspRecords.add(blastHspRecord);
                 count++;
             }
         }
-        if (count == 0){
-            throw  new IllegalArgumentException("Error");
+        if (count == 0) {
+            throw new IllegalArgumentException("Error");
         }
         boolean[] coverageArray = new boolean[queryLength];
-        for (BlastHspRecord blastHspRecord : queryHspRecords){
+        for (BlastHspRecord blastHspRecord : queryHspRecords) {
             int qstart = blastHspRecord.getQstart();
             int qend = blastHspRecord.getQend();
-            for (int i = qstart - 1; i < qend; i++){
+            for (int i = qstart - 1; i < qend; i++) {
                 coverageArray[i] = true;
             }
         }
 
         double coverage = 0;
-        for (boolean b : coverageArray){
-            if (b){
-                coverage ++;
+        for (boolean b : coverageArray) {
+            if (b) {
+                coverage++;
             }
         }
 
-        return coverage /queryLength;
+        return coverage / queryLength;
     }
 
 }

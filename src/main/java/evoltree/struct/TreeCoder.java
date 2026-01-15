@@ -60,6 +60,7 @@ public class TreeCoder<T extends EvolNode> {
 	public String code(T root) {
 		StringBuilder sBuilder = new StringBuilder(262144);
 		codeForInternalUse(root, sBuilder);
+		sBuilder.append(";");
 		return sBuilder.toString();
 	}
 

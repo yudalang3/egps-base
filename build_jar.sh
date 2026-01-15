@@ -1,10 +1,13 @@
 #!/bin/bash
 
+# ===== Get script directory (works regardless of where script is called from) =====
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # ===== 配置区 =====
-SOURCE_DIR="src/main/java"
-CLASS_OUTPUT="target/classes"
+SOURCE_DIR="${SCRIPT_DIR}/src/main/java"
+CLASS_OUTPUT="${SCRIPT_DIR}/target/classes"
 JAR_NAME="egps-base-0.0.1.jar"
-TEMP_JAR="$JAR_NAME"
+TEMP_JAR="${SCRIPT_DIR}/$JAR_NAME"
 
 # ===== 检查参数 =====
 if [ -z "$1" ]; then

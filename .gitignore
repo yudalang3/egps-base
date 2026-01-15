@@ -40,3 +40,5 @@ target/
 build_auto_package_and_move.sh
 
 egps-base-0.0.1.jar
+
+.claude/

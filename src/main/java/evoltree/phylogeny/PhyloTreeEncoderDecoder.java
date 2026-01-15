@@ -133,7 +133,8 @@ public class PhyloTreeEncoderDecoder {
      */
     public String encode(DefaultPhyNode tree) {
         TreeCoder<DefaultPhyNode> coder = new TreeCoder<>(new NWKLeafCoderDecoder<DefaultPhyNode>(), new NWKInternalCoderDecoder<DefaultPhyNode>());
-        return coder.code(tree);
+        String code = coder.code(tree);
+        return code;
     }
 
     /**
