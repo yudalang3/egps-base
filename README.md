@@ -1,5 +1,7 @@
 # egps-base
 
+**eGPS-Base** is a comprehensive bioinformatics utility library for evolutionary genomics and phylogenetic analysis. It serves as the foundational layer in the eGPS 2.1 ecosystem, providing core infrastructure without dependencies. The project is written in Java 25 and uses Maven for build management.
+
 The core infrastructure of the eGPS2 project. See the `docs` subdirectory for complete source-level class documentation.
 
 [中文版 README](README_zh.md)
@@ -100,4 +102,4 @@ This base module was developed continuously over the author's six PhD years and 
 
 Since the entire codebase has been open-sourced, you are welcome to read the source code directly; every class includes comments.
 
-Javadoc has not been generated because I do not think it is especially useful for people reading the code, and I believe it is not very developer-friendly. See the `docs` subdirectory for complete class documentation.
+Javadoc is not generated separately here, because reading the source code directly and using the class documentation in the `docs` subdirectory is more straightforward. See the `docs` subdirectory for complete class documentation.

@@ -1,5 +1,7 @@
 # egps-base
 
+**eGPS-Base** 是一个面向演化基因组学与系统发育分析的综合性生物信息学工具库。它作为 eGPS 2.1 生态中的基础层，提供无下层依赖的核心基础设施。项目使用 Java 25 编写，并采用 Maven 进行构建管理。
+
 eGPS2 项目的核心基础设施。完整的源代码`类`文档请参见 `docs` 子目录。
 
 [English README](README.md)
@@ -101,4 +103,4 @@ java -cp "../dependency-egps/*" cli.tools.SeeModulesWeHave
 
 因为我们已经将代码都开源了，欢迎各位直接看源代码，每个类都有注释。
 
-Javadoc 没有生成，因为 Javadoc 对于编写代码用户不是很大。而且我认为 Javadoc 对于开发人员来说，非常不友好。完整的类文档请参见 `docs` 子目录。
+这里没有单独生成 Javadoc 文档，因为相比之下，直接阅读源码和 `docs` 子目录中的类文档会更加直接。完整的类文档请参见 `docs` 子目录。
