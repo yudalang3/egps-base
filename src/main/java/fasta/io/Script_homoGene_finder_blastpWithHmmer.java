@@ -2,6 +2,13 @@ package fasta.io;
 
 import blast.parse.BlastHspRecord;
 import com.google.common.collect.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -55,10 +62,10 @@ import java.util.*;
  *
  * <h2>Command Line Parameters:</h2>
  * <ul>
- *   <li><strong>args[0]:</strong> Input directory containing species data</li>
- *   <li><strong>args[1]:</strong> Reference domain criteria file (TSV format)</li>
- *   <li><strong>args[2]:</strong> Species order file (optional, TSV format)</li>
- *   <li><strong>args[3]:</strong> Output directory for results</li>
+ *   <li><strong>-i / --input-dir:</strong> Input directory containing species data</li>
+ *   <li><strong>-c / --criteria:</strong> Reference domain criteria file (TSV format)</li>
+ *   <li><strong>-s / --species-order:</strong> Species order file (optional, TSV format)</li>
+ *   <li><strong>-o / --output-dir:</strong> Output directory for results</li>
  * </ul>
  *
  * <h2>Output Files:</h2>
@@ -103,10 +110,10 @@ import java.util.*;
  * <pre>
  * {@code
  * Script_homoGene_finder_blastpWithHmmer.main(new String[]{
- *     "/path/to/species/data/",
- *     "/path/to/domain/criteria.tsv",
- *     "/path/to/species/order.tsv",
- *     "/path/to/output/"
+ *     "-i", "/path/to/species/data/",
+ *     "-c", "/path/to/domain/criteria.tsv",
+ *     "-s", "/path/to/species/order.tsv",
+ *     "-o", "/path/to/output/"
  * });
  * }
  * </pre>
@@ -192,20 +199,22 @@ public class Script_homoGene_finder_blastpWithHmmer {
      * Displays help information for the script usage
      */
     private static void showHelp() {
-        System.err.println("Usage: Script_homoGene_finder_blastpWithHmmer <input_directory> <domain_criteria_file> <species_order_file> <output_directory>");
+        System.err.println("Purpose: Identify homologous genes by combining BLASTP/Diamond hits with HMMER Pfam domains.");
+        System.err.println("Output: Summary tables at multiple coverage thresholds.");
+        System.err.println("Usage: java fasta.io.Script_homoGene_finder_blastpWithHmmer -i <input_dir> -c <criteria.tsv> [-s <species_order.tsv>] -o <output_dir>");
         System.err.println();
         System.err.println("Parameters:");
-        System.err.println("  input_directory      Directory containing species data subdirectories with FASTA and BLAST files");
-        System.err.println("  domain_criteria_file TSV file containing reference domain criteria for homology assessment");
-        System.err.println("  species_order_file   Optional TSV file specifying the order of species in output (use 'null' if not needed)");
-        System.err.println("  output_directory     Directory where results will be written");
+        System.err.println("  -i, --input-dir       Directory containing species data subdirectories with FASTA and BLAST files");
+        System.err.println("  -c, --criteria        TSV file containing reference domain criteria for homology assessment");
+        System.err.println("  -s, --species-order   Optional TSV file specifying the order of species in output");
+        System.err.println("  -o, --output-dir      Directory where results will be written");
         System.err.println();
         System.err.println("Example:");
-        System.err.println("  java Script_homoGene_finder_blastpWithHmmer \\\\");
-        System.err.println("    /path/to/species/data \\\\");
-        System.err.println("    /path/to/domain/criteria.tsv \\\\");
-        System.err.println("    /path/to/species/order.tsv \\\\");
-        System.err.println("    /path/to/output/");
+        System.err.println("  java fasta.io.Script_homoGene_finder_blastpWithHmmer \\\\");
+        System.err.println("    -i /path/to/species/data \\\\");
+        System.err.println("    -c /path/to/domain/criteria.tsv \\\\");
+        System.err.println("    -s /path/to/species/order.tsv \\\\");
+        System.err.println("    -o /path/to/output/");
         System.err.println();
         System.err.println("Required input directory structure:");
         System.err.println("  input_directory/");
@@ -219,28 +228,20 @@ public class Script_homoGene_finder_blastpWithHmmer {
     }
 
     public static void main(String[] args) throws IOException {
-        // Check if correct number of arguments are provided
-        if (args.length != 4) {
-            System.err.println("Error: Invalid number of arguments. Expected 4 arguments but got " + args.length);
-            System.err.println();
-            showHelp();
-            System.exit(1);
+        // 命令行入口：使用 -i/-c/-s/-o 参数，详细说明见 --help（输出为英文）。
+        Options options = buildOptions();
+        CommandLine commandLine = parseOptions(options, args);
+        if (commandLine == null) {
+            return;
         }
+        String pathOfDir = commandLine.getOptionValue("input-dir");
+        String humanWntCompDomainFile = commandLine.getOptionValue("criteria");
+        String speciesOrderPath = commandLine.getOptionValue("species-order");
+        String outputDirPath = commandLine.getOptionValue("output-dir");
 
-        // Check if arguments are empty
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] == null || args[i].trim().isEmpty()) {
-                System.err.println("Error: Argument " + i + " is empty or null");
-                System.err.println();
-                showHelp();
-                System.exit(1);
-            }
+        if (speciesOrderPath == null) {
+            speciesOrderPath = "null";
         }
-
-        String pathOfDir = args[0];
-        String humanWntCompDomainFile = args[1];
-        String speciesOrderPath = args[2];
-        String outputDirPath = args[3];
 
         // Validate input directory exists
         if (!Files.exists(Paths.get(pathOfDir))) {
@@ -248,8 +249,8 @@ public class Script_homoGene_finder_blastpWithHmmer {
             System.exit(1);
         }
 
-        // Validate domain criteria file exists (unless it's "null" string)
-        if (!"null".equals(speciesOrderPath) && !Files.exists(Paths.get(humanWntCompDomainFile))) {
+        // Validate domain criteria file exists
+        if (!Files.exists(Paths.get(humanWntCompDomainFile))) {
             System.err.println("Error: Domain criteria file does not exist: " + humanWntCompDomainFile);
             System.exit(1);
         }
@@ -294,6 +295,62 @@ public class Script_homoGene_finder_blastpWithHmmer {
             scriptHomoGeneFinderBlastpWithHmmer.CANDIDATES_COVERAGE_THRESHOLD = 0.3;
             scriptHomoGeneFinderBlastpWithHmmer.runIt(pathOfDir);
         }
+    }
+
+    private static Options buildOptions() {
+        Options options = new Options();
+        options.addOption(Option.builder("i")
+                .longOpt("input-dir")
+                .hasArg()
+                .argName("dir")
+                .required()
+                .desc("Input directory containing species data.")
+                .build());
+        options.addOption(Option.builder("c")
+                .longOpt("criteria")
+                .hasArg()
+                .argName("tsv")
+                .required()
+                .desc("Domain criteria TSV file.")
+                .build());
+        options.addOption(Option.builder("s")
+                .longOpt("species-order")
+                .hasArg()
+                .argName("tsv")
+                .desc("Optional species order TSV file.")
+                .build());
+        options.addOption(Option.builder("o")
+                .longOpt("output-dir")
+                .hasArg()
+                .argName("dir")
+                .required()
+                .desc("Output directory for result tables.")
+                .build());
+        options.addOption(new Option("h", "help", false, "Print help."));
+        return options;
+    }
+
+    private static CommandLine parseOptions(Options options, String[] args) {
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine commandLine = parser.parse(options, args);
+            if (commandLine.hasOption("help")) {
+                printHelp(options);
+                showHelp();
+                return null;
+            }
+            return commandLine;
+        } catch (ParseException e) {
+            System.err.println("Error: " + e.getMessage());
+            printHelp(options);
+            showHelp();
+            return null;
+        }
+    }
+
+    private static void printHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("java fasta.io.Script_homoGene_finder_blastpWithHmmer", options, true);
     }
 
     private void configSpeciesOrder(List<String> speciesOrderList) {

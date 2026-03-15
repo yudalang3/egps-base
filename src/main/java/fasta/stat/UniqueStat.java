@@ -3,6 +3,13 @@ package fasta.stat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import fasta.io.FastaReader;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.io.IOException;
@@ -25,7 +32,7 @@ import java.util.StringJoiner;
  * <h2>Usage Example:</h2>
  * <pre>
  * // Command-line usage
- * java fasta.stat.UniqueStat input.fasta
+ * java fasta.stat.UniqueStat -i input.fasta
  * 
  * // Programmatic usage
  * double repeatRatio = UniqueStat.getRatio("sequences.fasta");
@@ -77,10 +84,54 @@ import java.util.StringJoiner;
  */
 public class UniqueStat {
     static boolean output = true;
+    // 命令行入口：使用 -i 指定输入，--quiet 可关闭重复列表输出（输出为英文）。
     public static void main(String[] args) throws IOException {
-        String fastaPath = args[0];
+        Options options = buildOptions();
+        CommandLine commandLine = parseOptions(options, args);
+        if (commandLine == null) {
+            return;
+        }
+        String fastaPath = commandLine.getOptionValue("input");
+        output = !commandLine.hasOption("quiet");
         double ratio = getRatio(fastaPath);
         System.out.println("Repeat ratio: " + ratio);
+    }
+
+    private static Options buildOptions() {
+        Options options = new Options();
+        options.addOption(Option.builder("i")
+                .longOpt("input")
+                .hasArg()
+                .argName("fasta")
+                .required()
+                .desc("Input FASTA file.")
+                .build());
+        options.addOption(new Option("q", "quiet", false, "Suppress duplicate listing."));
+        options.addOption(new Option("h", "help", false, "Print help."));
+        return options;
+    }
+
+    private static CommandLine parseOptions(Options options, String[] args) {
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine commandLine = parser.parse(options, args);
+            if (commandLine.hasOption("help")) {
+                printHelp(options);
+                return null;
+            }
+            return commandLine;
+        } catch (ParseException e) {
+            System.err.println("Error: " + e.getMessage());
+            printHelp(options);
+            return null;
+        }
+    }
+
+    private static void printHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        System.err.println("Purpose: Calculate duplicate sequence statistics for a FASTA file.");
+        System.err.println("Output: Duplicate groups (optional) and the repeat ratio.");
+        formatter.printHelp("java fasta.stat.UniqueStat", options, true);
     }
 
     public static double getRatio(String fastaPath) throws IOException {
@@ -105,7 +156,7 @@ public class UniqueStat {
             if (count > 1){
                 if (output){
                     List<String> strings = sequence2name.get(sequence);
-                    StringJoiner stringJoiner = new StringJoiner(";");
+                    StringJoiner stringJoiner = new StringJoiner("||");
                     for (String string : strings) {
                         stringJoiner.add(string);
                     }

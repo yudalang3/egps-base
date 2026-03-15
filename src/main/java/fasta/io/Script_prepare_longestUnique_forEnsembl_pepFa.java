@@ -1,6 +1,13 @@
 package fasta.io;
 
 import com.google.common.base.Joiner;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,9 +39,9 @@ import java.util.*;
  * 
  * <h2>Input Parameters:</h2>
  * <ul>
- *   <li><strong>args[0]:</strong> Input directory containing Ensembl protein FASTA files (.fa.gz)</li>
- *   <li><strong>args[1]:</strong> Output directory for processed files</li>
- *   <li><strong>args[2]:</strong> Summary file path for processing statistics</li>
+ *   <li><strong>-i / --input-dir:</strong> Input directory containing Ensembl protein FASTA files (.fa.gz)</li>
+ *   <li><strong>-o / --output-dir:</strong> Output directory for processed files</li>
+ *   <li><strong>-s / --summary:</strong> Summary file path for processing statistics</li>
  * </ul>
  * 
  * <h2>Output Files:</h2>
@@ -56,9 +63,9 @@ import java.util.*;
  * <pre>
  * {@code
  * Script_prepare_longestUnique_forEnsembl_pepFa.main(new String[]{
- *     "/path/to/ensembl/proteins/",
- *     "/path/to/output/",
- *     "/path/to/summary.tsv"
+ *     "-i", "/path/to/ensembl/proteins/",
+ *     "-o", "/path/to/output/",
+ *     "-s", "/path/to/summary.tsv"
  * });
  * }
  * </pre>
@@ -85,10 +92,16 @@ public class Script_prepare_longestUnique_forEnsembl_pepFa {
 
     static final String suffix = ".fa.gz";
 
+    // 命令行入口：使用 -i/-o/-s 指定输入目录、输出目录和汇总文件（输出为英文）。
     public static void main(String[] args) throws IOException {
-        String inputDir = args[0];
-        String outputDir = args[1];
-        String summaryFile = args[2];
+        Options options = buildOptions();
+        CommandLine commandLine = parseOptions(options, args);
+        if (commandLine == null) {
+            return;
+        }
+        String inputDir = commandLine.getOptionValue("input-dir");
+        String outputDir = commandLine.getOptionValue("output-dir");
+        String summaryFile = commandLine.getOptionValue("summary");
         if (inputDir == null) {
             throw new RuntimeException("Please input the pep fasta file dir.");
         }
@@ -113,6 +126,56 @@ public class Script_prepare_longestUnique_forEnsembl_pepFa {
         Files.write(Path.of(summaryFile), outputList);
     }
 
+    private static Options buildOptions() {
+        Options options = new Options();
+        options.addOption(Option.builder("i")
+                .longOpt("input-dir")
+                .hasArg()
+                .argName("dir")
+                .required()
+                .desc("Input directory containing .fa.gz files.")
+                .build());
+        options.addOption(Option.builder("o")
+                .longOpt("output-dir")
+                .hasArg()
+                .argName("dir")
+                .required()
+                .desc("Output directory for generated FASTA files.")
+                .build());
+        options.addOption(Option.builder("s")
+                .longOpt("summary")
+                .hasArg()
+                .argName("tsv")
+                .required()
+                .desc("Summary TSV output path.")
+                .build());
+        options.addOption(new Option("h", "help", false, "Print help."));
+        return options;
+    }
+
+    private static CommandLine parseOptions(Options options, String[] args) {
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine commandLine = parser.parse(options, args);
+            if (commandLine.hasOption("help")) {
+                printHelp(options);
+                return null;
+            }
+            return commandLine;
+        } catch (ParseException e) {
+            System.err.println("Error: " + e.getMessage());
+            printHelp(options);
+            return null;
+        }
+    }
+
+    private static void printHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        System.err.println("Purpose: Generate longest-CDS and unique protein FASTA files from Ensembl inputs.");
+        System.err.println("Output: *_longestCDS_unique.fa.gz files and a summary TSV.");
+        formatter.printHelp("java fasta.io.Script_prepare_longestUnique_forEnsembl_pepFa", options, true);
+    }
+
     private static void handleOneFile(Path pepFasta, String fileName, Path outputPath) throws IOException {
         Path outputPath1 = pepFasta.resolveSibling("longest.fa.gz");
         String s1 = Script_get_longest_CDS_forEnsembl_pepFa.transformProteomicFasta(pepFasta, outputPath1);
@@ -125,4 +188,3 @@ public class Script_prepare_longestUnique_forEnsembl_pepFa {
     }
 
 }
-

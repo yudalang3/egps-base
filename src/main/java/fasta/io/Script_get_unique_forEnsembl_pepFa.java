@@ -2,6 +2,13 @@ package fasta.io;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableObject;
 
@@ -68,7 +75,7 @@ import java.util.zip.GZIPOutputStream;
  * <pre>
  * {@code
  * # Explicit file path
- * Script_get_unique_forEnsembl_pepFa.main(new String[]{"/path/to/protein.fa.gz"});
+ * Script_get_unique_forEnsembl_pepFa.main(new String[]{"-i", "/path/to/protein.fa.gz"});
  * 
  * # Auto-detect file in current directory
  * Script_get_unique_forEnsembl_pepFa.main(new String[]{});
@@ -115,8 +122,21 @@ import java.util.zip.GZIPOutputStream;
  * @see FastaReader
  */
 public class Script_get_unique_forEnsembl_pepFa {
+    // 命令行入口：用 -i/-o 指定输入/输出，--keep-original 可保留原文件（输出为英文）。
     public static void main(String[] args) throws IOException {
-        String fastaPath = findGzipPepFasta(args);
+        Options options = buildOptions();
+        CommandLine commandLine = parseOptions(options, args);
+        if (commandLine == null) {
+            return;
+        }
+        String fastaPath = commandLine.getOptionValue("input");
+        if (fastaPath == null || fastaPath.isBlank()) {
+            fastaPath = findGzipPepFasta(new String[0]);
+        }
+        if (fastaPath == null) {
+            System.err.println("Error: No input .fa.gz file found.");
+            System.exit(1);
+        }
         if (fastaPath.endsWith("_unique.fa.gz")){
             System.err.println(fastaPath + "\tAlready unique");
             return;
@@ -126,14 +146,66 @@ public class Script_get_unique_forEnsembl_pepFa {
         String fileName = pepFasta.getFileName().toString();
         final String suffix = ".fa.gz";
 
-        String fileNameWithoutSuffix = fileName.substring(0, fileName.length() - suffix.length());
-        String outputFileName = fileNameWithoutSuffix + "_unique.fa.gz";
-        Path outputPath = pepFasta.resolveSibling(outputFileName);
-
+        String outputOverride = commandLine.getOptionValue("output");
+        Path outputPath;
+        if (outputOverride != null && !outputOverride.isBlank()) {
+            outputPath = Path.of(outputOverride);
+        } else {
+            if (!fileName.endsWith(suffix)){
+                throw new IllegalArgumentException("Input file name must end with .fa.gz");
+            }
+            String fileNameWithoutSuffix = fileName.substring(0, fileName.length() - suffix.length());
+            String outputFileName = fileNameWithoutSuffix + "_unique.fa.gz";
+            outputPath = pepFasta.resolveSibling(outputFileName);
+        }
 
         handle(pepFasta, outputPath);
 
-        Files.delete(pepFasta);
+        if (!commandLine.hasOption("keep-original")) {
+            Files.delete(pepFasta);
+        }
+    }
+
+    private static Options buildOptions() {
+        Options options = new Options();
+        options.addOption(Option.builder("i")
+                .longOpt("input")
+                .hasArg()
+                .argName("fa.gz")
+                .desc("Input FASTA (.fa.gz).")
+                .build());
+        options.addOption(Option.builder("o")
+                .longOpt("output")
+                .hasArg()
+                .argName("fa.gz")
+                .desc("Output FASTA path (default: *_unique.fa.gz).")
+                .build());
+        options.addOption(new Option("k", "keep-original", false, "Keep input file after writing output."));
+        options.addOption(new Option("h", "help", false, "Print help."));
+        return options;
+    }
+
+    private static CommandLine parseOptions(Options options, String[] args) {
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine commandLine = parser.parse(options, args);
+            if (commandLine.hasOption("help")) {
+                printHelp(options);
+                return null;
+            }
+            return commandLine;
+        } catch (ParseException e) {
+            System.err.println("Error: " + e.getMessage());
+            printHelp(options);
+            return null;
+        }
+    }
+
+    private static void printHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        System.err.println("Purpose: Deduplicate Ensembl protein FASTA sequences.");
+        System.err.println("Output: *_unique.fa.gz (and optionally keeps the original).");
+        formatter.printHelp("java fasta.io.Script_get_unique_forEnsembl_pepFa", options, true);
     }
 
     static String handle(Path pepFasta, Path outputPath) throws IOException {
@@ -203,4 +275,3 @@ public class Script_get_unique_forEnsembl_pepFa {
     }
 
 }
-

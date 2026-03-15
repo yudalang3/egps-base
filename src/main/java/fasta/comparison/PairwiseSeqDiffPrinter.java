@@ -1,5 +1,13 @@
 package fasta.comparison;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,7 +129,7 @@ public class PairwiseSeqDiffPrinter {
      */
     private static void printDiffInternal(String a, String b, int wrap,
                                           char matchMarker, char mismatchMarker, boolean markMatches) {
-        if (a == null || b == null) throw new IllegalArgumentException("输入字符串不能为 null");
+        if (a == null || b == null) throw new IllegalArgumentException("Input sequences must not be null.");
         if (wrap <= 0) wrap = Math.max(60, Math.max(a.length(), b.length()));
 
         final char GAP_PRINT = '·'; // 打印用占位符（展示缺失）
@@ -193,15 +201,109 @@ public class PairwiseSeqDiffPrinter {
         }
     }
 
-    // 简单 demo
+    // 命令行入口：用 -a/-b 指定序列，或用 --demo 演示（输出为英文）。
     public static void main(String[] args) {
-        String s1 = "MKT-AYLQ--VVV".replace("-", "");
-        String s2 = "MKTAFYLQPVVV".replace("-", "");
+        Options options = buildOptions();
+        CommandLine commandLine = parseOptions(options, args);
+        if (commandLine == null) {
+            return;
+        }
 
-        System.out.println("# 标注匹配（旧样式，'|'）：");
-        printDiff(s1, s2, 60);
+        if (commandLine.hasOption("demo")) {
+            String s1 = "MKT-AYLQ--VVV".replace("-", "");
+            String s2 = "MKTAFYLQPVVV".replace("-", "");
+            System.out.println("# Marking matches (legacy style, '|'):");
+            printDiff(s1, s2, 60);
+            System.out.println("\n# Marking mismatches ('^'):");
+            printDiffMarkingMismatches(s1, s2, 60, '^');
+            return;
+        }
 
-        System.out.println("\n# 标注差异（新样式，'^'）：");
-        printDiffMarkingMismatches(s1, s2, 60, '^');
+        String seqA = commandLine.getOptionValue("seq-a");
+        String seqB = commandLine.getOptionValue("seq-b");
+        if (seqA == null || seqB == null) {
+            System.err.println("Error: --seq-a and --seq-b are required unless --demo is set.");
+            printHelp(options);
+            return;
+        }
+
+        int wrap = 60;
+        String wrapStr = commandLine.getOptionValue("wrap");
+        if (wrapStr != null && !wrapStr.isBlank()) {
+            try {
+                wrap = Integer.parseInt(wrapStr);
+            } catch (NumberFormatException e) {
+                System.err.println("Error: --wrap must be an integer.");
+                return;
+            }
+        }
+
+        boolean markMismatches = commandLine.hasOption("mark-mismatches");
+        char marker = '^';
+        String markerStr = commandLine.getOptionValue("mismatch-marker");
+        if (markerStr != null && !markerStr.isEmpty()) {
+            marker = markerStr.charAt(0);
+        }
+
+        if (markMismatches) {
+            printDiffMarkingMismatches(seqA, seqB, wrap, marker);
+        } else {
+            printDiff(seqA, seqB, wrap);
+        }
+    }
+
+    private static Options buildOptions() {
+        Options options = new Options();
+        options.addOption(Option.builder("a")
+                .longOpt("seq-a")
+                .hasArg()
+                .argName("seq")
+                .desc("Sequence A (string).")
+                .build());
+        options.addOption(Option.builder("b")
+                .longOpt("seq-b")
+                .hasArg()
+                .argName("seq")
+                .desc("Sequence B (string).")
+                .build());
+        options.addOption(Option.builder("w")
+                .longOpt("wrap")
+                .hasArg()
+                .argName("int")
+                .desc("Wrap width (default: 60).")
+                .build());
+        options.addOption(new Option("m", "mark-mismatches", false, "Mark mismatches instead of matches."));
+        options.addOption(Option.builder("c")
+                .longOpt("mismatch-marker")
+                .hasArg()
+                .argName("char")
+                .desc("Mismatch marker character (default: ^).")
+                .build());
+        options.addOption(new Option("d", "demo", false, "Run built-in demo."));
+        options.addOption(new Option("h", "help", false, "Print help."));
+        return options;
+    }
+
+    private static CommandLine parseOptions(Options options, String[] args) {
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine commandLine = parser.parse(options, args);
+            if (commandLine.hasOption("help")) {
+                printHelp(options);
+                return null;
+            }
+            return commandLine;
+        } catch (ParseException e) {
+            System.err.println("Error: " + e.getMessage());
+            printHelp(options);
+            return null;
+        }
+    }
+
+    private static void printHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        System.err.println("Purpose: Visualize pairwise sequence differences with match/mismatch markers.");
+        System.err.println("Output: Formatted alignment view plus mismatch positions and identity.");
+        formatter.printHelp("java fasta.comparison.PairwiseSeqDiffPrinter", options, true);
     }
 }

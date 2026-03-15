@@ -115,6 +115,8 @@ Each module contains a `ZzzModuleSignature` class implementing this interface, m
 - Builder pattern for complex object creation (e.g., `UnifiedPrinterBuilder`)
 - Encoder/Decoder pattern for serialization
 - Module signature pattern for metadata and GUI integration
+- Language: code comments should be in Chinese; user-facing output (CLI help, logs, System.out/err messages) should be in English.
+- For lambda state, prefer `org.apache.commons.lang3.mutable` classes (e.g., `MutableInt`) instead of array wrappers.
 
 ## Development Notes
 

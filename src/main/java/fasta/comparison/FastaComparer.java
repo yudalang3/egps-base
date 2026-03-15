@@ -1,6 +1,13 @@
 package fasta.comparison;
 
 import fasta.io.FastaReader;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import tsv.io.TSVReader;
 
 import java.io.IOException;
@@ -23,7 +30,7 @@ import java.util.Map;
  * <h2>Usage Example:</h2>
  * <pre>
  * // Command-line usage
- * java fasta.comparison.FastaComparer query.fasta subject.fasta alignment.fmt6
+ * java fasta.comparison.FastaComparer -q query.fasta -s subject.fasta -a alignment.fmt6
  * 
  * // Output:
  * // The fasta1 matched count is 850, total count is 1000. 0.85
@@ -79,9 +86,68 @@ import java.util.Map;
  * @see fasta.io.FastaReader
  */
 public class FastaComparer {
+    // 命令行入口：使用 -q/-s/-a 参数，详细说明见 --help（输出为英文）。
     public static void main(String[] args) throws Exception {
+        Options options = buildOptions();
+        CommandLine commandLine = parseOptions(options, args);
+        if (commandLine == null) {
+            return;
+        }
+        String file1 = commandLine.getOptionValue("query");
+        String file2 = commandLine.getOptionValue("subject");
+        String fmt6outFile = commandLine.getOptionValue("alignment");
         FastaComparer comparator = new FastaComparer();
-        comparator.run(args[0],args[1], args[2]);
+        comparator.run(file1, file2, fmt6outFile);
+    }
+
+    private static Options buildOptions() {
+        Options options = new Options();
+        options.addOption(Option.builder("q")
+                .longOpt("query")
+                .hasArg()
+                .argName("fasta")
+                .required()
+                .desc("Query FASTA file.")
+                .build());
+        options.addOption(Option.builder("s")
+                .longOpt("subject")
+                .hasArg()
+                .argName("fasta")
+                .required()
+                .desc("Subject FASTA file.")
+                .build());
+        options.addOption(Option.builder("a")
+                .longOpt("alignment")
+                .hasArg()
+                .argName("fmt6")
+                .required()
+                .desc("BLAST/Diamond fmt6 file (tabular).")
+                .build());
+        options.addOption(new Option("h", "help", false, "Print help."));
+        return options;
+    }
+
+    private static CommandLine parseOptions(Options options, String[] args) {
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine commandLine = parser.parse(options, args);
+            if (commandLine.hasOption("help")) {
+                printHelp(options);
+                return null;
+            }
+            return commandLine;
+        } catch (ParseException e) {
+            System.err.println("Error: " + e.getMessage());
+            printHelp(options);
+            return null;
+        }
+    }
+
+    private static void printHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        System.err.println("Purpose: Compare two FASTA files using a BLAST/Diamond fmt6 alignment to compute coverage.");
+        System.err.println("Output: Matched counts and ratios for query and subject datasets.");
+        formatter.printHelp("java fasta.comparison.FastaComparer", options, true);
     }
 
     private void run(String file1, String file2, String fmt6outFile) throws IOException {

@@ -3,6 +3,13 @@ package fasta.io;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 /**
  * Protein sequence file organization utility script.
@@ -39,7 +46,7 @@ import java.nio.file.Path;
  * 
  * <h2>Usage Example:</h2>
  * <pre>
- * java Script_allocate_raw_pep_to_dir_by_fileName /path/to/protein/files /path/to/organized/output
+ * java Script_allocate_raw_pep_to_dir_by_fileName -i /path/to/protein/files -o /path/to/organized/output
  * </pre>
  * 
  * <h2>Example Directory Structure:</h2>
@@ -88,9 +95,15 @@ import java.nio.file.Path;
 public class Script_allocate_raw_pep_to_dir_by_fileName {
     static final String suffix = ".fa.gz";
 
+    // 命令行入口：使用 -i/-o 指定输入输出目录（输出为英文）。
     public static void main(String[] args) throws IOException {
-        String inputDir = args[0];
-        String outputDir = args[1];
+        Options options = buildOptions();
+        CommandLine commandLine = parseOptions(options, args);
+        if (commandLine == null) {
+            return;
+        }
+        String inputDir = commandLine.getOptionValue("input-dir");
+        String outputDir = commandLine.getOptionValue("output-dir");
         if (inputDir == null) {
             throw new RuntimeException("Please input the pep fasta file dir.");
         }
@@ -112,6 +125,49 @@ public class Script_allocate_raw_pep_to_dir_by_fileName {
 
     }
 
+    private static Options buildOptions() {
+        Options options = new Options();
+        options.addOption(Option.builder("i")
+                .longOpt("input-dir")
+                .hasArg()
+                .argName("dir")
+                .required()
+                .desc("Input directory containing .fa.gz files.")
+                .build());
+        options.addOption(Option.builder("o")
+                .longOpt("output-dir")
+                .hasArg()
+                .argName("dir")
+                .required()
+                .desc("Output directory for organized files.")
+                .build());
+        options.addOption(new Option("h", "help", false, "Print help."));
+        return options;
+    }
+
+    private static CommandLine parseOptions(Options options, String[] args) {
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine commandLine = parser.parse(options, args);
+            if (commandLine.hasOption("help")) {
+                printHelp(options);
+                return null;
+            }
+            return commandLine;
+        } catch (ParseException e) {
+            System.err.println("Error: " + e.getMessage());
+            printHelp(options);
+            return null;
+        }
+    }
+
+    private static void printHelp(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        System.err.println("Purpose: Organize .fa.gz protein files into subdirectories by filename prefix.");
+        System.err.println("Output: Copies files into per-prefix folders under the output directory.");
+        formatter.printHelp("java fasta.io.Script_allocate_raw_pep_to_dir_by_fileName", options, true);
+    }
+
     private static void handleOneFile(Path pepFasta, String fileName, String outputDir) throws IOException {
         int indexOf = fileName.indexOf('.');
         if (indexOf == -1) {
@@ -127,4 +183,3 @@ public class Script_allocate_raw_pep_to_dir_by_fileName {
     }
 
 }
-

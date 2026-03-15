@@ -1,19 +1,18 @@
 # egps-base
 
-eGPS2 项目的核心基础设施。完整的类文档请参见 `docs` 子目录。
+eGPS2 项目的核心基础设施。完整的源代码`类`文档请参见 `docs` 子目录。
 
 [English README](README.md)
 
-如果您想要一个egps-base, egps-shell和egps-pathway.evol.browser 捆绑在一起的版本，请访问 https://github.com/yudalang3/eGPS2.1
 
 ## 关于本项目
 
 完整文档请访问：https://www.yuque.com/u21499046/egpsdoc
 
-类注释请参见 `/docs` 目录。
+完整的源代码`类`文档请参见 `docs` 子目录，此处为技术性总结。
 
 
-## 模块关系
+## 从技术角度来看模块关系
 
 从 eGPS 1.0 -> eGPS 2.0 -> eGPS 2.1，我们改变了技术架构。
 
@@ -30,24 +29,22 @@ graph TD
 
 ```
 
-这是 `egps-base` 项目。
+此处是底层的 `egps-base` 项目。
 
 注意：`egps-main.gui` 模块**未开源**，但可以免费使用。
 
-上图是一个经典的模块依赖的有向无环图（DAG）：
+上图是一个经典的模块依赖有向无环图（DAG）：
 
-1. 最顶层是一个依赖`eGPS2.1`的应用项目，例如一个演化生物学的研究项目
-2. `egps-base`是一个最顶层无依赖的一些utils库
+1. 最顶层是一个依赖`eGPS2.1`的应用项目，例如一个演化生物学的研究项目（Wnt ppathway evolutionary research）
+2. `egps-base`是一个最底层无依赖的一些utils功能的类似
 3. `egps-main.gui`就是整个eGPS框架，它有VOICE框架
-4. `non-gui complex modules`就是非小工具类的大型模块
-5. `Convenient tools for biologists`是一些对于科研工作者很好用的趁手工具
+4. `non-gui complex modules`就是非小工具类的大型模块，主要是algorithms类
+5. `Convenient tools for biologists`是一些对于科研工作者很好用的趁手工具，有图形界面
 
 
 # 如何运行本项目
 
-直接 `clone` 本仓库，然后导入 `IDEA`。
-
-我们使用 `Java 25`。
+直接 `clone` 本仓库，然后导入 `IDEA`，本项目使用的是 `Java 25`。若你用VS Code，Eclipse等IDE，使用相应的方式导入即可。
 
 
 ## 如何部署
@@ -67,12 +64,11 @@ mvn clean package source:jar
 
 # 如何使用
 
-## 在 macOS 上
+在 macOS 上和Windows上，支持GUI和CLI两种方式使用：
 
 ### GUI 示例
-```bash
-java -cp "dependency-egps/*" gui.simple.tools.FilePathNormalizedGUI
-```
+
+直接启动软件即可，如果你需要所有模块都加载的软件，那么可以进入[通路进化浏览器](https://github.com/yudalang3/egps-pathway.evol.browser)，在Release下载即可。
 
 
 ### 命令行示例
@@ -105,4 +101,4 @@ java -cp "../dependency-egps/*" cli.tools.SeeModulesWeHave
 
 因为我们已经将代码都开源了，欢迎各位直接看源代码，每个类都有注释。
 
-Javadoc 我没有生成，因为 Javadoc 对于编写代码用户不是很大。而且我认为 Javadoc 对于开发人员来说，非常不友好。完整的类文档请参见 `docs` 子目录。
+Javadoc 没有生成，因为 Javadoc 对于编写代码用户不是很大。而且我认为 Javadoc 对于开发人员来说，非常不友好。完整的类文档请参见 `docs` 子目录。
