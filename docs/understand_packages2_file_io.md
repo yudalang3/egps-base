@@ -99,6 +99,7 @@ Top-level source files:
 Important subpackages and entry points:
 
 - `msaoperator.alignment` - `AlignmentPreprocesser`, `CompeleDeletion`, `PairwiseDeletion`, `PartialDeletion`, `DeletionHandler`, `GlobalAlignmentSettings`
+- `msaoperator.alignment.sequence` - the sequence object model: `SequenceI` (core interface), `Sequence` (base implementation), `BasicSequenceData` (data storage), `SequenceComponentRatio` (composition-ratio statistics)
 - `msaoperator.io` - `MSAFileParser`
 - `msaoperator.io.seqFormat.parser` - concrete format parsers
 - `msaoperator.io.seqFormat.writer` - concrete format writers

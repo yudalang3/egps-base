@@ -4,18 +4,22 @@
 
 ## Document Role
 
-This note documents the current axis tick calculation code under `graphic.engine`. It is a focused design note, not a general overview of the visualization subsystem.
+This note documents the current axis tick calculation code under `graphic.engine`. It is a focused design note and a more detailed companion to the visualization implementation guide.
+
+## Problem It Solves
+
+When drawing a 2D figure, one of the most important steps is choosing suitable tick marks for the current horizontal and vertical data ranges. These calculator classes are meant to compute visually reasonable ticks automatically, including both tick count and spacing.
 
 ## Current Implementation
 
-### `AxisTickCalculator`
+### 1. `AxisTickCalculator`
 
 - uses a fixed step hint of `64` pixels between ticks
 - uses a compact Nice Numbers sequence based on `1`, `2`, `5`, and `10`
 - switches between normal and scientific formatting for labels
 - works well for ordinary chart widths, but may produce sparse ticks when the drawing space becomes small
 
-### `AxisTickCalculatorHeavy`
+### 2. `AxisTickCalculatorHeavy`
 
 - evaluates multiple step hints: `32`, `48`, `64`, `80`, `96`
 - uses an expanded mantissa set: `1.0`, `1.2`, `1.5`, `2.0`, `2.5`, `3.0`, `4.0`, `5.0`, `6.0`, `8.0`, `10.0`

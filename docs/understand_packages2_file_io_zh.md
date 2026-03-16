@@ -99,6 +99,7 @@
 重要子包与入口：
 
 - `msaoperator.alignment` - `AlignmentPreprocesser`、`CompeleDeletion`、`PairwiseDeletion`、`PartialDeletion`、`DeletionHandler`、`GlobalAlignmentSettings`
+- `msaoperator.alignment.sequence` - 序列对象模型：`SequenceI`（核心接口）、`Sequence`（基础实现）、`BasicSequenceData`（数据存储）、`SequenceComponentRatio`（组成比例统计）
 - `msaoperator.io` - `MSAFileParser`
 - `msaoperator.io.seqFormat.parser` - 各格式解析器
 - `msaoperator.io.seqFormat.writer` - 各格式写出器

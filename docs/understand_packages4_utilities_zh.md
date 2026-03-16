@@ -12,7 +12,7 @@
 
 用途：
 
-- 提供被多个包反复复用的广义通用工具能力
+- 提供被多个包复用的广义通用工具能力
 
 代表性源码文件：
 
@@ -55,6 +55,7 @@
 
 - `DateTimeOperator`
 - `EGPSTimeUtil`
+- `LocalDateHandler`
 
 ### `utils.collections`
 
